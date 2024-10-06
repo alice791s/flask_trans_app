@@ -12,10 +12,13 @@ pyngrok = PyNgrok()
 # Initialize Flask app
 def create_app():
     app = Flask(__name__)
+    
+    # Set default config values if not already set
+    app.config.setdefault('FLASK_ENV', 'development')  # Set 'development' as the default environment
+    
     pyngrok.init_app(app)  # Initialize PyNgrok for Flask app
     return app
 
-app = create_app()
 
 # Load the model and tokenizer
 device = "cuda" if torch.cuda.is_available() else "cpu"
