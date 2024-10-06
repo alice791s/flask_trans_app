@@ -1,14 +1,21 @@
-from flask_ngrok import run_with_ngrok
 from flask import Flask, render_template, request, jsonify
-
+from flask_pyngrok import PyNgrok
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from gtts import gTTS
 import base64
 from io import BytesIO
 
+# Initialize PyNgrok
+pyngrok = PyNgrok()
+
 # Initialize Flask app
-app = Flask(__name__)
+def create_app():
+    app = Flask(__name__)
+    pyngrok.init_app(app)  # Initialize PyNgrok for Flask app
+    return app
+
+app = create_app()
 
 # Load the model and tokenizer
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -20,6 +27,7 @@ language_model = AutoModelForCausalLM.from_pretrained(
 )
 tokenizer = AutoTokenizer.from_pretrained(language_model_name)
 
+# Processing input and generating response
 def process_input(input_text, action):
     if action == "Translate to English":
         prompt = f"Please translate the following text into English: {input_text}"
@@ -59,18 +67,16 @@ def process_input(input_text, action):
     output_text = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     return output_text, lang
 
+# Convert text to speech
 def text_to_speech(text, lang):
-    try:
-        tts = gTTS(text=text, lang=lang)
-        filename = "output_audio.mp3"
-        tts.save(filename)
-        with open(filename, "rb") as file:
-            encoded_string = base64.b64encode(file.read()).decode('utf-8')
-        return encoded_string
-    except Exception as e:
-        print(f"Error in text-to-speech conversion: {e}")
-        return None
+    tts = gTTS(text=text, lang=lang)
+    filename = "output_audio.mp3"
+    tts.save(filename)
+    with open(filename, "rb") as file:
+        encoded_string = base64.b64encode(file.read()).decode('utf-8')
+    return encoded_string
 
+# Flask routes
 @app.route('/')
 def initial():
     return render_template('index.html')
@@ -78,17 +84,11 @@ def initial():
 @app.route('/translate-and-chat', methods=['POST'])
 def handle_interaction():
     data = request.json
-    input_text = data.get('input_text')
-    action = data.get('action')
-
-    if not input_text or not action:
-        return jsonify({'error': 'Invalid input'}), 400
+    input_text = data['input_text']
+    action = data['action']
 
     output_text, lang = process_input(input_text, action)
     audio_data = text_to_speech(output_text, lang)
-
-    if not audio_data:
-        return jsonify({'error': 'Failed to generate audio'}), 500
 
     response = {
         'output_text': output_text,
@@ -97,6 +97,6 @@ def handle_interaction():
     return jsonify(response)
 
 if __name__ == '__main__':
-    run_with_ngrok(app)  # Run with Ngrok
-    app.run()
+    app.run()  # Use Flask's built-in server
+
 
