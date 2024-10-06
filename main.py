@@ -18,7 +18,8 @@ def create_app():
     
     pyngrok.init_app(app)  # Initialize PyNgrok for Flask app
     return app
-
+    
+app = create_app()
 
 # Load the model and tokenizer
 device = "cuda" if torch.cuda.is_available() else "cpu"
