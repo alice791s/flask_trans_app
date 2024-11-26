@@ -3,5 +3,6 @@ torch>=1.4
 diffusers==0.30.3
 transformers
 accelerate
-pyngrok==7.0.5
-Flask-PyNgrok==1.0.0
+pyngrok==7.2.1
+Flask-PyNgrok==1.0.3
+flask==2.0.0
