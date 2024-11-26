@@ -4,4 +4,4 @@ diffusers==0.30.3
 transformers
 accelerate
 pyngrok==7.2.1
-Flask-PyNgrok==1.0.3
+Flask-PyNgrok==1.0.0
