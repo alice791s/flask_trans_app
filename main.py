@@ -104,17 +104,6 @@ def handle_interaction():
             'message': str(e)
         }), 500
 
-# Create necessary directories
-if not os.path.exists('templates'):
-    os.makedirs('templates')
-
-if not os.path.exists('static'):
-    os.makedirs('static')
-
-
-# Save CSS file
-with open('static/styles.css', 'w', encoding='utf-8') as f:
-    f.write(css_content)
 
 if __name__ == '__main__':
     app.run()
