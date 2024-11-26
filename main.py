@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from flask_pyngrok import PyNgrok
+from flask import current_app
+from flask.ctx import _app_ctx_stack
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from gtts import gTTS
