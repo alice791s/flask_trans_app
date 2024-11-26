@@ -1,3 +1,11 @@
+from flask import Flask, render_template, request, jsonify
+from flask_ngrok import run_with_ngrok
+import torch
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from gtts import gTTS
+import base64
+import os
+
 # Initialize Flask app
 app = Flask(__name__)
 run_with_ngrok(app)
