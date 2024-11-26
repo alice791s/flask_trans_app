@@ -8,4 +8,5 @@ accelerate
 #Flask==3.0.3
 flask-ngrok
 pyngrok
-flask==2.0.0
+flask==2.0.1
+werkzeug==2.0.1
