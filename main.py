@@ -1,13 +1,6 @@
-from flask import Flask, render_template, request, jsonify
-from flask_ngrok import run_with_ngrok
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from gtts import gTTS
-import base64
-import os
-
+# Initialize Flask app
 app = Flask(__name__)
-run_with_ngrok(app)  # Start ngrok when app is run
+run_with_ngrok(app)
 
 # Load the model and tokenizer
 print("Loading model...")
@@ -26,20 +19,21 @@ def get_translation_settings(action):
         "Translate to English": ("Please translate the following text into English: ", "en"),
         "Translate to Chinese": ("Please translate the following text into Chinese: ", "zh-cn"),
         "Translate to Japanese": ("Please translate the following text into Japanese: ", "ja"),
-        "Translate to Russian": ("Please translate the following text into Russian: ", "ru")
+        "Translate to Russian": ("Please translate the following text into Russian: ", "ru"),
+        "Chat with AI": ("", "en")
     }
     return settings.get(action, (None, "en"))
 
 def process_input(input_text, action):
     prompt_template, lang = get_translation_settings(action)
     
-    if prompt_template:
-        prompt = f"{prompt_template}{input_text}"
-    else:
+    if action == "Chat with AI":
         prompt = input_text
+    else:
+        prompt = f"{prompt_template}{input_text}"
     
     messages = [
-        {"role": "system", "content": "You are a helpful AI translator."},
+        {"role": "system", "content": "You are a helpful AI assistant."},
         {"role": "user", "content": prompt}
     ]
     
@@ -102,14 +96,17 @@ def handle_interaction():
             'message': str(e)
         }), 500
 
-
-
-# Create templates directory and save HTML
+# Create necessary directories
 if not os.path.exists('templates'):
     os.makedirs('templates')
-    
-with open('templates/index.html', 'w', encoding='utf-8') as f:
-    f.write(html_template)
+
+if not os.path.exists('static'):
+    os.makedirs('static')
+
+
+# Save CSS file
+with open('static/styles.css', 'w', encoding='utf-8') as f:
+    f.write(css_content)
 
 if __name__ == '__main__':
     app.run()
